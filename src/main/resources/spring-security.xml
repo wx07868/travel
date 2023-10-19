@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:security="http://www.springframework.org/schema/security"
+
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security.xsd">
+
+    <!--登录权限过滤的排除页面-->
+    <security:http security="none" pattern="/login.html"/>
+    <security:http security="none" pattern="/admin/403.html"/>
+    <security:http security="none" pattern="/img/**"/>
+    <security:http security="none" pattern="/css/**"/>
+    <security:http security="none" pattern="/js/**"/>
+    <security:http security="none" pattern="/plugins/**"/>
+
+
+
+
+    <!--设置拦截的资源路径-->
+    <security:http auto-config="true" use-expressions="false">
+
+        <!--设置所有的资源请求都需要经过此验证才能通过，并且允许登录的用户角色为ROLE_USER-->
+        <security:intercept-url pattern="/**" access="ROLE_USER,ROLE_ADMIN,ROLE_BOSS"></security:intercept-url>
+
+        <!--登录验证处理-->
+        <!--登录界面的路径-->
+        <!--点击登录后信息处理跳转到哪里-->
+        <!--登录提交表单的name名称设定-->
+        <!--登录过滤成功后要跳转的页面-->
+        <!--登录过滤失败的跳转页面-->
+        <security:form-login
+                login-page="/login.html"
+                login-processing-url="/login"
+                username-parameter="username" password-parameter="password"
+                authentication-success-forward-url="/admin/user/login.do"
+                authentication-failure-url="/admin/403.html"></security:form-login>
+
+
+
+        <security:csrf disabled="true"></security:csrf>
+
+
+    </security:http>
+
+    <security:global-method-security jsr250-annotations="enabled"></security:global-method-security>
+
+    <security:authentication-manager>
+
+        <!--登录权限的信息通过servicce1来查找-->
+        <security:authentication-provider user-service-ref="Service11"></security:authentication-provider>
+
+    </security:authentication-manager>
+
+</beans>

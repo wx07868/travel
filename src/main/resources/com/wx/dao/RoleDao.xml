@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.wx.dao.RoleDao">
+    <resultMap id="fbi" type="com.wx.entity.Role" autoMapping="true">
+        <id column="rid" property="id"></id>
+        <collection property="permissions" javaType="List" autoMapping="true" ofType="com.wx.entity.Permission">
+            <id property="id" column="pid"></id>
+        </collection>
+    </resultMap>
+    <select id="findById" resultMap="fbi">
+        select *,
+               p.id pid,
+               r.id rid
+        from role r,
+             permission p,
+             role_permission rp
+        where r.id = rp.roleId
+          and p.id = rp.permissionId
+          and r.id = #{id}
+    </select>
+
+
+    <select id="findOtherPermission" resultType="com.wx.entity.Permission">
+        select * from permission where id not in (select permissionId from role_permission where roleId = #{id})
+    </select>
+
+</mapper>

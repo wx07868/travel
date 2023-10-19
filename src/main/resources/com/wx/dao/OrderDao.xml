@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wx.dao.OrderDao">
+
+    <!--查询所有订单的信息-->
+    <resultMap id="fao" type="com.wx.entity.Orders" autoMapping="true">
+        <id property="id" column="id"></id>
+        <association property="product" javaType="com.wx.entity.Product" autoMapping="true">
+            <id property="id" column="id"></id>
+        </association>
+    </resultMap>
+    <select id="findAllOrder" resultMap="fao" >
+        select * from orders,product where orders.productId = product.id
+    </select>
+
+
+    <!--查询一个订单的信息-->
+    <resultMap id="findone" type="com.wx.entity.Orders" autoMapping="true">
+        <id property="id" column="id"></id>
+        <association property="product" javaType="com.wx.entity.Product" autoMapping="true">
+            <id property="id" column="id"></id>
+        </association>
+    </resultMap>
+    <select id="editById" resultMap="findone" >
+        select * from orders,product where orders.productId = #{id}
+    </select>
+
+
+
+
+    <!--查询多个表订单的信息-->
+    <resultMap id="orderById" type="com.wx.entity.Orders" autoMapping="true">
+        <id column="id" property="id" />
+        <association property="product" javaType="com.wx.entity.Product" autoMapping="true">
+            <id property="id" column="pid"/>
+        </association>
+        <association property="member" javaType="com.wx.entity.Member" autoMapping="true">
+            <id property="id" column="meid"/>
+        </association>
+        <collection property="travellers" javaType="List" ofType="com.wx.entity.Traveller" autoMapping="true">
+            <id property="id" column="tid"/>
+        </collection>
+    </resultMap>
+    <select id="findById"  resultMap="orderById">
+        SELECT
+            * ,
+            p.id AS pid,
+            m.id AS  meid,
+            t.id AS tid
+        FROM
+            orders o,
+            product	p,
+            member m ,
+            traveller t,
+            order_traveller ot
+
+        WHERE
+            o.productId = p.id AND
+            o.memberId = m.id AND
+            ot.orderId = o.id AND
+            t.id = ot.travellerId AND o.id=#{id}
+    </select>
+
+
+</mapper>

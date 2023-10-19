@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wx.dao.UserDao">
+
+    <!--用户详情-->
+    <resultMap id="userInfoById" type="com.wx.entity.Users" autoMapping="true">
+        <id column="id" property="id"/>
+        <!--用户对应的角色-->
+        <collection property="roles" ofType="com.wx.entity.Role" javaType="List" autoMapping="true">
+            <id column="rid" property="id"/>
+            <!--角色对应的资源-->
+            <collection property="permissions" ofType="com.wx.entity.Permission" javaType="List" autoMapping="true">
+                <id column="pid" property="id"/>
+            </collection>
+        </collection>
+    </resultMap>
+    <select id="findById"  resultMap="userInfoById">
+
+        SELECT
+            * ,
+            r.`id` rid,
+            p.`id` pid
+
+        FROM
+            users u,
+            role r,
+            users_role ur,
+            permission p,
+            role_permission rp
+        WHERE
+            u.`id` = ur.`userId` AND
+            r.`id` = ur.`roleId` AND
+            r.`id` = rp.`roleId` AND
+            p.`id` = rp.`permissionId` AND
+            u.`id` = #{id};
+    </select>
+
+
+    <!--查询用户的信息-->
+    <select id="findUserByID" resultType="com.wx.entity.Users">
+        select * from users where id = #{id}
+    </select>
+
+
+    <!--查询用户没有的权限-->
+    <select id="findOtherRoles" resultType="com.wx.entity.Role">
+        select * from role where id not in(select roleId from users_role where userId = #{id})
+    </select>
+
+
+    <!--添加用户权限-->
+    <insert id="addRoleToUser" parameterType="int">
+        insert into users_role values (#{userId}, #{roleid});
+    </insert>
+
+</mapper>
